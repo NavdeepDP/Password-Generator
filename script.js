@@ -20,8 +20,7 @@ function validatePasswordLength(passwordLengthUserInput) {
   var passwordMaxLength = 128;
   var passwordMinLength = 8;
 
-  if (passwordLengthUserInput === null)
-    passwordValid = false;
+  if (passwordLengthUserInput === null) passwordValid = false;
 
   //passwordLength validation
   var passwordLength = parseInt(passwordLengthUserInput);
@@ -59,7 +58,6 @@ function generatePassword() {
   var passwordLength;
 
   if (passwordValid) {
-
     passwordLength = parseInt(passwordLengthUserInput);
 
     var includeSpecialChars = confirm(
@@ -82,51 +80,97 @@ function generatePassword() {
     );
     console.log("Uppercase characters inclusion: " + includeUppercaseChars);
 
-    if (!includeSpecialChars && !includeNumericChars && !includeLowercaseChars && !includeUppercaseChars) {
-      alert("At least one character type should be selected.")
+    if (
+      !includeSpecialChars &&
+      !includeNumericChars &&
+      !includeLowercaseChars &&
+      !includeUppercaseChars
+    ) {
+      alert("At least one character type should be selected.");
       passwordValid = false;
     }
   }
 
-
   ////////==============Logic=================================//////////////
 
   if (passwordValid) {
-
     var keyStrings = {
       lowerCase: "abcdefghijklmnopqrstuvwxyz",
       upperCase: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
       numbers: "0123456789",
-      specialChars: "!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}\~\\"
-
+      specialChars: "!\"#$%&'()*+,-./:;<=>?@[]^_`{|}~\\",
     };
-
 
     var searchString = "";
 
-    if (includeLowercaseChars)
-      searchString += keyStrings.lowerCase;
-    if (includeUppercaseChars)
-      searchString += keyStrings.upperCase;
-    if (includeNumericChars)
-      searchString += keyStrings.numbers;
-    if (includeSpecialChars)
-      searchString += keyStrings.specialChars;
+    if (includeLowercaseChars) searchString += keyStrings.lowerCase;
+    if (includeUppercaseChars) searchString += keyStrings.upperCase;
+    if (includeNumericChars) searchString += keyStrings.numbers;
+    if (includeSpecialChars) searchString += keyStrings.specialChars;
 
     if (searchString.length > 0) {
       password = "";
 
-
-
       for (var i = 1; i <= passwordLength; i++) {
-        // var option = Math.floor(Math.random() * 4);
-        // if(option === 1)
-        //    searchString = keyStrings.lowerCase;
-        // else if(option === 2)
-        //    searchString = keyStrings.lowerCase;
-        password += searchString[Math.floor(Math.random() * searchString.length)];
+        password +=
+          searchString[Math.floor(Math.random() * searchString.length)];
       }
     }
+
+    // Generate four random numbers
+    var randomPasswordIndex = [];
+    for (var i = 1; i <= 4; i++) {
+      var index = Math.floor(Math.random() * password.length)
+      var matchFound = true;
+      while (matchFound) {
+        matchFound = false;
+        for (var j = 0; j < randomPasswordIndex.length; j++) {
+          if (randomPasswordIndex[j] === index) {
+            matchFound = true;
+            break;
+          }
+        }
+        if(matchFound)
+           index = Math.floor(Math.random() * password.length);
+        
+      }
+      if (!matchFound)
+        randomPasswordIndex.push(index);
+    }
+
+    console.log("Befor last manipulation: " + password);
+    // use the random indices to make sure each character set is included
+    if (includeLowercaseChars) 
+    {
+      searchString = keyStrings.lowerCase;
+      var tempindex = randomPasswordIndex[0];
+      var tempchar =  searchString[Math.floor(Math.random() * searchString.length)];
+      password = password.substr(0, tempindex) + tempchar + password.substr(tempindex +1);
+    }
+    if (includeUppercaseChars)
+    {
+      searchString = keyStrings.upperCase;
+      var tempindex = randomPasswordIndex[1];
+      var tempchar =  searchString[Math.floor(Math.random() * searchString.length)];
+      password = password.substr(0, tempindex) + tempchar + password.substr(tempindex +1);
+    } 
+    if (includeNumericChars) 
+    {
+      searchString = keyStrings.numbers;
+      var tempindex = randomPasswordIndex[2];
+      var tempchar =  searchString[Math.floor(Math.random() * searchString.length)];
+      password = password.substr(0, tempindex) + tempchar + password.substr(tempindex +1);
+      
+    }
+    if (includeSpecialChars)
+    { 
+      searchString = keyStrings.specialChars;
+      var tempindex = randomPasswordIndex[3];
+      var tempchar =  searchString[Math.floor(Math.random() * searchString.length)];
+      password = password.substr(0, tempindex) + tempchar + password.substr(tempindex +1);
+    }
+
+
   }
   console.log(password);
   return password;
