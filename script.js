@@ -1,6 +1,20 @@
 // Assignment Code
 var generateBtn = document.querySelector("#generate");
 
+/**
+ * VARIABLE DECLARATIONS
+ */
+var passwordValid = false;
+var passwordLength = 0;
+var includeSpecialChars = false;
+var includeNumericChars = false;
+var includeLowercaseChars = false;
+var includeUppercaseChars = false;
+
+/**
+ * FUNCTION DEFINITIONS
+ */
+
 // Write password to the #password input
 function writePassword() {
   var password = generatePassword();
@@ -9,11 +23,11 @@ function writePassword() {
   passwordText.value = password;
 }
 
-//  Function to validate password length. This function checks the following:
-//  - User press CANCEL
-//  - Entered password length is not a number.
-//  - if the user entry is valid number then check for password length less than 8 or greater than 128.
-
+/**  Function to validate password length. This function checks the following:
+ *  - User press CANCEL
+ *  - Entered password length is not a number.
+ *  - if the user entry is valid number then check for password length less than 8 or greater than 128.
+ */
 function validatePasswordLength(passwordLengthUserInput) {
   var passwordValid = true;
   // Password Maximum and Minimum length
@@ -42,43 +56,45 @@ function validatePasswordLength(passwordLengthUserInput) {
   return passwordValid;
 }
 
-// Function to generate password
-function generatePassword() {
-  var password = "Your Secure Password not generated";
-
-  // get the user inputs
+/**
+ * Function to get the inputs from user and calls the function to validate user input.
+ */
+function getUserInputs() {
+  // get the user input - Password length
   var passwordLengthUserInput = prompt(
     "How many characters would you like your password to contain?"
   );
-  console.log("Password length: " + passwordLengthUserInput);
+  //console.log("Password length: " + passwordLengthUserInput);
 
   // Validate password length user input
-  var passwordValid = validatePasswordLength(passwordLengthUserInput);
-
-  var passwordLength;
+  passwordValid = validatePasswordLength(passwordLengthUserInput);
 
   if (passwordValid) {
     passwordLength = parseInt(passwordLengthUserInput);
 
-    var includeSpecialChars = confirm(
+    // User Input - to include special characters
+    includeSpecialChars = confirm(
       "Click OK to confirm including special characters."
     );
-    console.log("Special Chars inclusion: " + includeSpecialChars);
+   // console.log("Special Chars inclusion: " + includeSpecialChars);
 
-    var includeNumericChars = confirm(
+    // User Input - to include numeric characters
+    includeNumericChars = confirm(
       "Click OK to confirm including numeric characters."
     );
-    console.log("Numeric Chars inclusion: " + includeNumericChars);
+   // console.log("Numeric Chars inclusion: " + includeNumericChars);
 
-    var includeLowercaseChars = confirm(
+    // User Input - to include lower characters
+    includeLowercaseChars = confirm(
       "Click OK to confirm including lowercase characters."
     );
-    console.log("Lowercase characters inclusion: " + includeLowercaseChars);
+   // console.log("Lowercase characters inclusion: " + includeLowercaseChars);
 
-    var includeUppercaseChars = confirm(
+    // User Input - to include uppercase characters
+    includeUppercaseChars = confirm(
       "Click OK to confirm including uppercase characters."
     );
-    console.log("Uppercase characters inclusion: " + includeUppercaseChars);
+   // console.log("Uppercase characters inclusion: " + includeUppercaseChars);
 
     if (
       !includeSpecialChars &&
@@ -90,8 +106,24 @@ function generatePassword() {
       passwordValid = false;
     }
   }
+}
 
-  ////////==============Logic=================================//////////////
+/**
+ * This function gets the user input, call the function to validate user input and
+ *  and generate password based on user selections.
+ */
+
+// Function to generate password
+function generatePassword() {
+  var password = "Your Secure Password not generated";
+
+  // get user input to set the criteria to generate password.
+  getUserInputs();
+
+  ////////============== Password Generation Logic=================================//////////////
+
+  // Password generation logic will run only if the the user input meets all the minimum 
+  //criteria to generate password
 
   if (passwordValid) {
     var keyStrings = {
@@ -101,12 +133,14 @@ function generatePassword() {
       specialChars: "!\"#$%&'()*+,-./:;<=>?@[]^_`{|}~\\",
     };
 
-    var searchString = "";
+    var searchString = ""; 
 
+    // generate the string which contains all the character types selected by user
     if (includeLowercaseChars) searchString += keyStrings.lowerCase;
     if (includeUppercaseChars) searchString += keyStrings.upperCase;
     if (includeNumericChars) searchString += keyStrings.numbers;
     if (includeSpecialChars) searchString += keyStrings.specialChars;
+
 
     if (searchString.length > 0) {
       password = "";
@@ -117,10 +151,15 @@ function generatePassword() {
       }
     }
 
+    // The below logic is to make sure that at least one character is present from all the
+    // types (lowercase, uppercase, numbers and/or special chars)
+    // selected by user.
+
+
     // Generate four random numbers
     var randomPasswordIndex = [];
     for (var i = 1; i <= 4; i++) {
-      var index = Math.floor(Math.random() * password.length)
+      var index = Math.floor(Math.random() * password.length);
       var matchFound = true;
       while (matchFound) {
         matchFound = false;
@@ -130,49 +169,56 @@ function generatePassword() {
             break;
           }
         }
-        if(matchFound)
-           index = Math.floor(Math.random() * password.length);
-        
+        if (matchFound) index = Math.floor(Math.random() * password.length);
       }
-      if (!matchFound)
-        randomPasswordIndex.push(index);
+      if (!matchFound) randomPasswordIndex.push(index);
     }
 
-    console.log("Befor last manipulation: " + password);
+    //console.log("Before last manipulation: " + password);
+
     // use the random indices to make sure each character set is included
-    if (includeLowercaseChars) 
-    {
+    if (includeLowercaseChars) {
       searchString = keyStrings.lowerCase;
-      var tempindex = randomPasswordIndex[0];
-      var tempchar =  searchString[Math.floor(Math.random() * searchString.length)];
-      password = password.substr(0, tempindex) + tempchar + password.substr(tempindex +1);
+      var randomIndex = randomPasswordIndex[0];
+      var randomChar =
+        searchString[Math.floor(Math.random() * searchString.length)];
+      password =
+        password.substr(0, randomIndex) +
+        randomChar +
+        password.substr(randomIndex + 1);
     }
-    if (includeUppercaseChars)
-    {
+    if (includeUppercaseChars) {
       searchString = keyStrings.upperCase;
-      var tempindex = randomPasswordIndex[1];
-      var tempchar =  searchString[Math.floor(Math.random() * searchString.length)];
-      password = password.substr(0, tempindex) + tempchar + password.substr(tempindex +1);
-    } 
-    if (includeNumericChars) 
-    {
+      var randomIndex = randomPasswordIndex[1];
+      var randomChar =
+        searchString[Math.floor(Math.random() * searchString.length)];
+      password =
+        password.substr(0, randomIndex) +
+        randomChar +
+        password.substr(randomIndex + 1);
+    }
+    if (includeNumericChars) {
       searchString = keyStrings.numbers;
-      var tempindex = randomPasswordIndex[2];
-      var tempchar =  searchString[Math.floor(Math.random() * searchString.length)];
-      password = password.substr(0, tempindex) + tempchar + password.substr(tempindex +1);
-      
+      var randomIndex = randomPasswordIndex[2];
+      var randomChar =
+        searchString[Math.floor(Math.random() * searchString.length)];
+      password =
+        password.substr(0, randomIndex) +
+        randomChar +
+        password.substr(randomIndex + 1);
     }
-    if (includeSpecialChars)
-    { 
+    if (includeSpecialChars) {
       searchString = keyStrings.specialChars;
-      var tempindex = randomPasswordIndex[3];
-      var tempchar =  searchString[Math.floor(Math.random() * searchString.length)];
-      password = password.substr(0, tempindex) + tempchar + password.substr(tempindex +1);
+      var randomIndex = randomPasswordIndex[3];
+      var randomChar =
+        searchString[Math.floor(Math.random() * searchString.length)];
+      password =
+        password.substr(0, randomIndex) +
+        randomChar +
+        password.substr(randomIndex + 1);
     }
-
-
   }
-  console.log(password);
+  //console.log(password);
   return password;
 }
 
